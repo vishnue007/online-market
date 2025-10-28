@@ -20,12 +20,19 @@ A full-stack online marketplace built with modern web technologies. This project
 - **Tailwind CSS** - Utility-first CSS framework
 - **Pinia** - State management for Vue.js
 
+run backend local:
+npm run dev
+
 ### Backend
 - **Node.js** - JavaScript runtime
 - **Express.js** - Web application framework
 - **CORS** - Cross-Origin Resource Sharing
 - **Helmet** - Security middleware
 - **Morgan** - HTTP request logger
+
+run backend local
+cd backend
+node server.js
 
 ### Development Tools
 - **ESLint** - Code linting

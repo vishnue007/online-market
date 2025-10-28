@@ -21,12 +21,6 @@
                 Home
               </NuxtLink>
               <NuxtLink 
-                to="/products" 
-                class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Products
-              </NuxtLink>
-              <NuxtLink 
                 to="/about" 
                 class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >

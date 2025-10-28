@@ -37,20 +37,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes (placeholder)
-app.use('/api', (req, res) => {
-  res.json({
-    message: 'API endpoints will be implemented here',
-    availableRoutes: [
-      'GET /api/products',
-      'POST /api/products',
-      'GET /api/users',
-      'POST /api/auth/login',
-      'POST /api/auth/register'
-    ]
-  });
-});
-
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -64,7 +50,7 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     message: 'Route not found',
-    availableRoutes: ['/', '/health', '/api']
+    availableRoutes: ['/', '/health']
   });
 });
 

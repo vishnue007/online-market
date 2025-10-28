@@ -59,27 +59,6 @@
         </div>
       </div>
     </section>
-
-    <!-- API Status Section -->
-    <section class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="card text-center">
-          <h2 class="text-2xl font-bold mb-4">API Connection Status</h2>
-          <div v-if="apiStatus === 'loading'" class="text-gray-600">
-            Checking API connection...
-          </div>
-          <div v-else-if="apiStatus === 'connected'" class="text-green-600">
-            ✅ Backend API is connected and running!
-          </div>
-          <div v-else class="text-red-600">
-            ❌ Could not connect to backend API
-          </div>
-          <button @click="checkApiStatus" class="btn-primary mt-4">
-            Check Again
-          </button>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -89,26 +68,6 @@ useHead({
   title: 'Home'
 })
 
-// API status check
-const apiStatus = ref('loading')
-const config = useRuntimeConfig()
-
-const checkApiStatus = async () => {
-  try {
-    apiStatus.value = 'loading'
-    const response = await fetch(`${config.public.apiBaseUrl}/health`)
-    if (response.ok) {
-      apiStatus.value = 'connected'
-    } else {
-      apiStatus.value = 'error'
-    }
-  } catch (error) {
-    apiStatus.value = 'error'
-  }
-}
-
-// Check API status on mount
 onMounted(() => {
-  checkApiStatus()
 })
 </script>
