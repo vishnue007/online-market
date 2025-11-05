@@ -1,54 +1,65 @@
 <template>
-  <div class="flex items-center justify-center h-[calc(100vh-150px)] bg-gray-100">
-    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
-      <h2 class="text-2xl font-semibold mb-6 text-center">Create Account</h2>
+  <div class="w-full max-w-md">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full">
+      <!-- Logo/Brand -->
+      <div class="text-center mb-8">
+        <NuxtLink to="/" class="inline-block">
+          <h1 class="text-3xl font-bold text-blue-600 mb-2">Online Market</h1>
+        </NuxtLink>
+        <p class="text-gray-600">Create your account and start shopping today!</p>
+      </div>
+
+      <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Account</h2>
 
       <form @submit.prevent="handleRegister">
         <div class="mb-4">
-          <label class="block text-gray-700 text-sm mb-2">Full Name</label>
+          <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
           <input
             v-model="name"
             type="text"
             required
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             placeholder="Enter your full name"
           />
         </div>
 
         <div class="mb-4">
-          <label class="block text-gray-700 text-sm mb-2">Email</label>
+          <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
           <input
             v-model="email"
             type="email"
             required
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
             placeholder="Enter your email"
           />
         </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm mb-2">Password</label>
+        <div class="mb-6">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Password</label>
           <input
             v-model="password"
             type="password"
             required
             minlength="6"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
-            placeholder="Create a password"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            placeholder="Create a password (min. 6 characters)"
           />
         </div>
 
-        <button
+        <AppButton
           type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition"
+          variant="primary"
+          size="lg"
+          :full-width="true"
+          :loading="isLoading"
         >
           Register
-        </button>
+        </AppButton>
       </form>
 
-      <p class="text-center text-sm text-gray-600 mt-4">
+      <p class="text-center text-sm text-gray-600 mt-6">
         Already have an account?
-        <NuxtLink to="/login" class="text-blue-600 hover:underline">Login</NuxtLink>
+        <NuxtLink to="/login" class="text-blue-600 hover:text-blue-700 font-medium hover:underline">Login</NuxtLink>
       </p>
     </div>
   </div>
@@ -56,11 +67,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from '#app'
+
+// Use auth layout (no header, no footer)
+definePageMeta({
+  layout: 'auth'
+})
+
+// Page meta
+useHead({
+  title: 'Sign Up'
+})
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
 const router = useRouter()
 
 const handleRegister = async () => {
@@ -69,17 +90,25 @@ const handleRegister = async () => {
     return
   }
 
-  // Mock user data saving (replace with API later)
-  const user = {
-    name: name.value,
-    email: email.value,
-    password: password.value,
+  isLoading.value = true
+
+  try {
+    // Mock user data saving (replace with API later)
+    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    
+    const user = {
+      name: name.value,
+      email: email.value,
+      password: password.value,
+    }
+
+    // Save to localStorage just for demo
+    localStorage.setItem('registeredUser', JSON.stringify(user))
+    alert('Registration Successful!')
+
+    router.push('/login')
+  } finally {
+    isLoading.value = false
   }
-
-  // Save to localStorage just for demo
-  localStorage.setItem('registeredUser', JSON.stringify(user))
-  alert('Registration Successful!')
-
-  router.push('/login')
 }
 </script>

@@ -10,12 +10,12 @@
           Your one-stop destination for quality products and amazing deals
         </p>
         <div class="space-x-4">
-          <NuxtLink to="/products" class="btn-primary text-lg px-8 py-3">
+          <AppButton to="/products" variant="primary" size="lg">
             Shop Now
-          </NuxtLink>
-          <NuxtLink to="/about" class="btn-secondary text-lg px-8 py-3">
+          </AppButton>
+          <AppButton to="/about" variant="secondary" size="lg">
             Learn More
-          </NuxtLink>
+          </AppButton>
         </div>
       </div>
     </section>

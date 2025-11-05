@@ -31,14 +31,9 @@
 
           <!-- User Actions -->
           <div class="flex items-center space-x-4">
-            <button class="btn-primary">
-               <NuxtLink 
-                to="/login" 
-                class="text-white text-sm font-medium transition-colors"
-              >
-                Sign In
-              </NuxtLink>
-            </button>
+            <AppButton to="/login" variant="primary" size="md">
+              Sign In
+            </AppButton>
           </div>
         </div>
       </nav>
