@@ -66,10 +66,20 @@ useHead({
   title: 'Login'
 })
 
+// Check if already logged in, redirect to home
+const authStore = useAuthStore()
+const router = useRouter()
+
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
-const router = useRouter()
+
+onMounted(() => {
+  authStore.checkAuth()
+  if (authStore.isLoggedIn) {
+    router.push('/home')
+  }
+})
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
@@ -84,8 +94,14 @@ const handleLogin = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
     
     if (email.value === 'user@example.com' && password.value === '123456') {
-      alert('Login Successful!')
-      router.push('/')
+      // Login successful - save to auth store
+      authStore.login({
+        email: email.value,
+        name: 'User'
+      })
+      
+      // Redirect to home page
+      router.push('/home')
     } else {
       alert('Invalid email or password')
     }

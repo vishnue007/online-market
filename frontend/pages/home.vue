@@ -59,6 +59,25 @@
         </div>
       </div>
     </section>
+
+    <!-- Welcome User Section -->
+    <section class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="card text-center">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">
+            Welcome back, {{ authStore.user?.name || authStore.user?.email || 'User' }}!
+          </h2>
+          <p class="text-gray-600 mb-6">
+            You're successfully logged in. Start exploring our products and enjoy shopping!
+          </p>
+          <div class="flex justify-center gap-4">
+            <AppButton variant="outline" @click="handleLogout">
+              Logout
+            </AppButton>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -68,19 +87,16 @@ useHead({
   title: 'Home'
 })
 
-// Redirect to login if not authenticated
+// Protect this route - require authentication
+definePageMeta({
+  middleware: 'auth'
+})
+
 const authStore = useAuthStore()
 const router = useRouter()
 
-onMounted(() => {
-  authStore.checkAuth()
-  
-  // If not authenticated, redirect to login
-  if (!authStore.isLoggedIn) {
-    router.push('/login')
-  } else {
-    // If authenticated, redirect to home page
-    router.push('/home')
-  }
-})
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>

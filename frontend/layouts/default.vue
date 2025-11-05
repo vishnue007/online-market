@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
           <div class="flex-shrink-0">
-            <NuxtLink to="/" class="text-2xl font-bold text-blue-600">
+            <NuxtLink :to="authStore.isLoggedIn ? '/home' : '/'" class="text-2xl font-bold text-blue-600">
               Online Market
             </NuxtLink>
           </div>
@@ -15,7 +15,7 @@
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <NuxtLink 
-                to="/" 
+                to="/home" 
                 class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Home
@@ -31,9 +31,19 @@
 
           <!-- User Actions -->
           <div class="flex items-center space-x-4">
-            <AppButton to="/login" variant="primary" size="md">
-              Sign In
-            </AppButton>
+            <template v-if="authStore.isLoggedIn">
+              <span class="text-sm text-gray-600 hidden md:block">
+                {{ authStore.user?.name || authStore.user?.email }}
+              </span>
+              <AppButton variant="outline" size="md" @click="handleLogout">
+                Logout
+              </AppButton>
+            </template>
+            <template v-else>
+              <AppButton to="/login" variant="primary" size="md">
+                Sign In
+              </AppButton>
+            </template>
           </div>
         </div>
       </nav>
@@ -56,5 +66,16 @@
 </template>
 
 <script setup>
-// Layout-specific logic can go here
+const authStore = useAuthStore()
+const router = useRouter()
+
+// Check auth on mount
+onMounted(() => {
+  authStore.checkAuth()
+})
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>

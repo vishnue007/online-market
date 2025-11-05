@@ -68,4 +68,9 @@
 useHead({
   title: 'About Us'
 })
+
+// Protect this route - require authentication
+definePageMeta({
+  middleware: 'auth'
+})
 </script>

@@ -78,11 +78,21 @@ useHead({
   title: 'Sign Up'
 })
 
+// Check if already logged in, redirect to home
+const authStore = useAuthStore()
+const router = useRouter()
+
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
-const router = useRouter()
+
+onMounted(() => {
+  authStore.checkAuth()
+  if (authStore.isLoggedIn) {
+    router.push('/home')
+  }
+})
 
 const handleRegister = async () => {
   if (!name.value || !email.value || !password.value) {
@@ -104,9 +114,17 @@ const handleRegister = async () => {
 
     // Save to localStorage just for demo
     localStorage.setItem('registeredUser', JSON.stringify(user))
+    
+    // Auto-login after registration
+    authStore.login({
+      email: email.value,
+      name: name.value
+    })
+    
     alert('Registration Successful!')
 
-    router.push('/login')
+    // Redirect to home page
+    router.push('/home')
   } finally {
     isLoading.value = false
   }
