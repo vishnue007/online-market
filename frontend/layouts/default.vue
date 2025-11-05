@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo -->
           <div class="flex-shrink-0">
-            <NuxtLink :to="authStore.isLoggedIn ? '/home' : '/'" class="text-2xl font-bold text-blue-600">
+            <NuxtLink :to="authStore.isLoggedIn ? '/' : '/login'" class="text-2xl font-bold text-blue-600">
               Online Market
             </NuxtLink>
           </div>
@@ -15,7 +15,7 @@
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <NuxtLink 
-                to="/home" 
+                to="/" 
                 class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Home

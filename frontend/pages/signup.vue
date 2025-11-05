@@ -90,7 +90,7 @@ const isLoading = ref(false)
 onMounted(() => {
   authStore.checkAuth()
   if (authStore.isLoggedIn) {
-    router.push('/home')
+    router.push('/')
   }
 })
 
@@ -124,7 +124,7 @@ const handleRegister = async () => {
     alert('Registration Successful!')
 
     // Redirect to home page
-    router.push('/home')
+    router.push('/')
   } finally {
     isLoading.value = false
   }

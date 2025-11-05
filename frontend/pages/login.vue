@@ -77,7 +77,7 @@ const isLoading = ref(false)
 onMounted(() => {
   authStore.checkAuth()
   if (authStore.isLoggedIn) {
-    router.push('/home')
+    router.push('/')
   }
 })
 
@@ -101,7 +101,7 @@ const handleLogin = async () => {
       })
       
       // Redirect to home page
-      router.push('/home')
+      router.push('/')
     } else {
       alert('Invalid email or password')
     }

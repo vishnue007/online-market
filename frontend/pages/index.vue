@@ -80,7 +80,7 @@ onMounted(() => {
     router.push('/login')
   } else {
     // If authenticated, redirect to home page
-    router.push('/home')
+    router.push('/')
   }
 })
 </script>
