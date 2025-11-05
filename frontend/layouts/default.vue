@@ -32,7 +32,12 @@
           <!-- User Actions -->
           <div class="flex items-center space-x-4">
             <button class="btn-primary">
-              Sign In
+               <NuxtLink 
+                to="/login" 
+                class="text-white text-sm font-medium transition-colors"
+              >
+                Sign In
+              </NuxtLink>
             </button>
           </div>
         </div>
