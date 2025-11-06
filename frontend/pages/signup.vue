@@ -11,19 +11,6 @@
 
       <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Account</h2>
 
-      <!-- Error message -->
-      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-sm text-red-600">{{ errorMessage }}</p>
-        <ul v-if="errors.length > 0" class="mt-2 list-disc list-inside text-sm text-red-600">
-          <li v-for="error in errors" :key="error">{{ error }}</li>
-        </ul>
-      </div>
-
-      <!-- Success message -->
-      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-        <p class="text-sm text-green-600">{{ successMessage }}</p>
-      </div>
-
       <form @submit.prevent="handleRegister">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
@@ -85,27 +72,22 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-// Use auth layout (no header, no footer)
 definePageMeta({
   layout: 'auth'
 })
 
-// Page meta
 useHead({
   title: 'Sign Up'
 })
 
-// Check if already logged in, redirect to home
 const authStore = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
-const errors = ref<string[]>([])
 
 onMounted(() => {
   authStore.checkAuth()
@@ -115,26 +97,19 @@ onMounted(() => {
 })
 
 const handleRegister = async () => {
-  // Clear previous messages
-  errorMessage.value = ''
-  successMessage.value = ''
-  errors.value = []
-
-  // Validation
   if (!name.value || !email.value || !password.value) {
-    errorMessage.value = 'Please fill all fields'
+    toast.error('Please fill all fields')
     return
   }
 
   if (password.value.length < 6) {
-    errorMessage.value = 'Password must be at least 6 characters'
+    toast.error('Password must be at least 6 characters')
     return
   }
 
   isLoading.value = true
 
   try {
-    // Call API register
     const result = await authStore.registerWithApi({
       name: name.value.trim(),
       email: email.value.trim(),
@@ -142,21 +117,20 @@ const handleRegister = async () => {
     })
     
     if (result.success) {
-      successMessage.value = result.message || 'Registration successful!'
-      
-      // Auto-login after successful registration
-      // Redirect to home page after short delay
+      toast.success(result.message || 'Registration successful!')
       setTimeout(() => {
         router.push('/')
       }, 1000)
     } else {
-      errorMessage.value = result.message || 'Registration failed'
+      toast.error(result.message || 'Registration failed')
       if (result.errors && result.errors.length > 0) {
-        errors.value = result.errors
+        result.errors.forEach((error: string) => {
+          toast.error(error)
+        })
       }
     }
   } catch (error: any) {
-    errorMessage.value = error.message || 'An error occurred during registration'
+    toast.error(error.message || 'An error occurred during registration')
   } finally {
     isLoading.value = false
   }
