@@ -11,6 +11,19 @@
 
       <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Account</h2>
 
+      <!-- Error message -->
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-600">{{ errorMessage }}</p>
+        <ul v-if="errors.length > 0" class="mt-2 list-disc list-inside text-sm text-red-600">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </div>
+
+      <!-- Success message -->
+      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-sm text-green-600">{{ successMessage }}</p>
+      </div>
+
       <form @submit.prevent="handleRegister">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
@@ -18,7 +31,8 @@
             v-model="name"
             type="text"
             required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            :disabled="isLoading"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter your full name"
           />
         </div>
@@ -29,7 +43,8 @@
             v-model="email"
             type="email"
             required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            :disabled="isLoading"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter your email"
           />
         </div>
@@ -41,7 +56,8 @@
             type="password"
             required
             minlength="6"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            :disabled="isLoading"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Create a password (min. 6 characters)"
           />
         </div>
@@ -52,6 +68,7 @@
           size="lg"
           :full-width="true"
           :loading="isLoading"
+          :disabled="isLoading"
         >
           Register
         </AppButton>
@@ -86,6 +103,9 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
+const errors = ref<string[]>([])
 
 onMounted(() => {
   authStore.checkAuth()
@@ -95,36 +115,48 @@ onMounted(() => {
 })
 
 const handleRegister = async () => {
+  // Clear previous messages
+  errorMessage.value = ''
+  successMessage.value = ''
+  errors.value = []
+
+  // Validation
   if (!name.value || !email.value || !password.value) {
-    alert('Please fill all fields')
+    errorMessage.value = 'Please fill all fields'
+    return
+  }
+
+  if (password.value.length < 6) {
+    errorMessage.value = 'Password must be at least 6 characters'
     return
   }
 
   isLoading.value = true
 
   try {
-    // Mock user data saving (replace with API later)
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-    
-    const user = {
-      name: name.value,
-      email: email.value,
-      password: password.value,
-    }
-
-    // Save to localStorage just for demo
-    localStorage.setItem('registeredUser', JSON.stringify(user))
-    
-    // Auto-login after registration
-    authStore.login({
-      email: email.value,
-      name: name.value
+    // Call API register
+    const result = await authStore.registerWithApi({
+      name: name.value.trim(),
+      email: email.value.trim(),
+      password: password.value
     })
     
-    alert('Registration Successful!')
-
-    // Redirect to home page
-    router.push('/')
+    if (result.success) {
+      successMessage.value = result.message || 'Registration successful!'
+      
+      // Auto-login after successful registration
+      // Redirect to home page after short delay
+      setTimeout(() => {
+        router.push('/')
+      }, 1000)
+    } else {
+      errorMessage.value = result.message || 'Registration failed'
+      if (result.errors && result.errors.length > 0) {
+        errors.value = result.errors
+      }
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || 'An error occurred during registration'
   } finally {
     isLoading.value = false
   }

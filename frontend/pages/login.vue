@@ -11,6 +11,16 @@
 
       <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Login</h2>
       
+      <!-- Error message -->
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-600">{{ errorMessage }}</p>
+      </div>
+
+      <!-- Success message -->
+      <div v-if="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-sm text-green-600">{{ successMessage }}</p>
+      </div>
+      
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
@@ -18,7 +28,8 @@
             v-model="email"
             type="email"
             required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            :disabled="isLoading"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter your email"
           />
         </div>
@@ -29,7 +40,8 @@
             v-model="password"
             type="password"
             required
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            :disabled="isLoading"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter your password"
           />
         </div>
@@ -40,6 +52,7 @@
           size="lg"
           :full-width="true"
           :loading="isLoading"
+          :disabled="isLoading"
         >
           Login
         </AppButton>
@@ -73,6 +86,8 @@ const router = useRouter()
 const email = ref('')
 const password = ref('')
 const isLoading = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
 
 onMounted(() => {
   authStore.checkAuth()
@@ -82,29 +97,37 @@ onMounted(() => {
 })
 
 const handleLogin = async () => {
+  // Clear previous messages
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  // Validation
   if (!email.value || !password.value) {
-    alert('Please fill all fields')
+    errorMessage.value = 'Please fill all fields'
     return
   }
 
   isLoading.value = true
   
   try {
-    // Example: Simulate API login
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    // Call API login
+    const result = await authStore.loginWithApi({
+      email: email.value,
+      password: password.value
+    })
     
-    if (email.value === 'user@example.com' && password.value === '123456') {
-      // Login successful - save to auth store
-      authStore.login({
-        email: email.value,
-        name: 'User'
-      })
+    if (result.success) {
+      successMessage.value = result.message || 'Login successful!'
       
-      // Redirect to home page
-      router.push('/')
+      // Redirect to home page after short delay
+      setTimeout(() => {
+        router.push('/')
+      }, 500)
     } else {
-      alert('Invalid email or password')
+      errorMessage.value = result.message || 'Invalid email or password'
     }
+  } catch (error: any) {
+    errorMessage.value = error.message || 'An error occurred during login'
   } finally {
     isLoading.value = false
   }

@@ -19,14 +19,16 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Initialize auth check
-  checkAuth()
+  // Initialize auth check only on client
+  if (process.client) {
+    checkAuth()
+  }
 
   // Computed
   const isLoggedIn = computed(() => isAuthenticated.value && user.value !== null)
 
   // Actions
-  const login = (userData: { email: string; name?: string }) => {
+  const login = (userData: { email: string; name?: string; _id?: string }) => {
     user.value = userData
     isAuthenticated.value = true
     
@@ -34,6 +36,42 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('user', JSON.stringify(userData))
       localStorage.setItem('isAuthenticated', 'true')
     }
+  }
+
+  // API login method
+  const loginWithApi = async (credentials: { email: string; password: string }) => {
+    const { login: apiLogin } = useAuthApi()
+    const result = await apiLogin(credentials)
+    
+    if (result.success && result.data?.data?.user) {
+      const userData = result.data.data.user
+      login({
+        email: userData.email,
+        name: userData.name,
+        _id: userData._id
+      })
+      return { success: true, message: result.data.message || 'Login successful' }
+    }
+    
+    return { success: false, message: result.message || 'Login failed' }
+  }
+
+  // API register method
+  const registerWithApi = async (userData: { name: string; email: string; password: string }) => {
+    const { register: apiRegister } = useAuthApi()
+    const result = await apiRegister(userData)
+    
+    if (result.success && result.data?.data?.user) {
+      const registeredUser = result.data.data.user
+      login({
+        email: registeredUser.email,
+        name: registeredUser.name,
+        _id: registeredUser._id
+      })
+      return { success: true, message: result.data.message || 'Registration successful' }
+    }
+    
+    return { success: false, message: result.message || 'Registration failed', errors: result.errors || [] }
   }
 
   const logout = () => {
@@ -52,6 +90,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isLoggedIn,
     login,
+    loginWithApi,
+    registerWithApi,
     logout,
     checkAuth
   }

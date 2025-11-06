@@ -1,11 +1,17 @@
 const User = require('../models/User');
 
-// Register new user
 const register = async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database is not connected. Please check MongoDB connection.'
+      });
+    }
+
     const { name, email, password } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -13,7 +19,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({
@@ -22,14 +27,12 @@ const register = async (req, res) => {
       });
     }
 
-    // Create new user
     const user = await User.create({
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      password // Password will be hashed by pre-save hook
+      password
     });
 
-    // Remove password from response
     const userResponse = user.toJSON();
 
     res.status(201).json({
@@ -40,9 +43,6 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Register error:', error);
-    
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -52,7 +52,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Handle duplicate key error (email)
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -68,12 +67,18 @@ const register = async (req, res) => {
   }
 };
 
-// Login user
 const login = async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database is not connected. Please check MongoDB connection.'
+      });
+    }
+
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -81,7 +86,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Find user and include password for comparison
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user) {
@@ -91,7 +95,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Check if user is active
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
@@ -99,7 +102,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Compare passwords
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -108,7 +110,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Remove password from response
     const userResponse = user.toJSON();
 
     res.status(200).json({
@@ -119,7 +120,6 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error during login',
