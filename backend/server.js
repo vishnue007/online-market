@@ -4,6 +4,10 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
+// Database connection
+const connectDB = require('./config/database');
+connectDB();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -24,7 +28,10 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      api: '/api'
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login'
+      }
     }
   });
 });
@@ -33,9 +40,14 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    database: 'MongoDB'
   });
 });
+
+// API Routes
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
