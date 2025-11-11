@@ -39,7 +39,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'x-user-id', 'x-user-role'],
   exposedHeaders: ['Content-Length', 'Content-Type'],
   preflightContinue: false,
   optionsSuccessStatus: 204,
@@ -80,7 +80,9 @@ app.get('/health', (req, res) => {
 
 // API Routes
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Server Error:', err.message);

@@ -14,15 +14,21 @@ export default defineNuxtRouteMiddleware((to, from) => {
     authStore.checkAuth()
     
     // If user is not authenticated and trying to access protected routes
-    // Redirect to login (except for login and signup pages)
-    if (!authStore.isLoggedIn && to.path !== '/login' && to.path !== '/signup' && to.path !== '/') {
+    // Redirect to login (except for login, signup, and admin login pages)
+    if (!authStore.isLoggedIn && to.path !== '/login' && to.path !== '/signup' && to.path !== '/admin/login' && to.path !== '/') {
       return navigateTo('/login')
     }
     
     // If user is authenticated and trying to access login/signup pages
-    // Redirect to home
+    // Redirect to home (but allow admin login if not admin)
     if (authStore.isLoggedIn && (to.path === '/login' || to.path === '/signup')) {
       return navigateTo('/')
+    }
+    
+    // Allow admin login page even if logged in (user might want to switch accounts)
+    // But redirect if already admin
+    if (authStore.isLoggedIn && authStore.isAdmin && to.path === '/admin/login') {
+      return navigateTo('/admin/dashboard')
     }
   } catch (error) {
     // If there's an error accessing the store, just allow the route

@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<{ email: string; name?: string } | null>(null)
+  const user = ref<{ email: string; name?: string; _id?: string; role?: string } | null>(null)
   const isAuthenticated = ref(false)
 
   // Check if user is authenticated (check localStorage on init)
@@ -26,9 +26,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Computed
   const isLoggedIn = computed(() => isAuthenticated.value && user.value !== null)
+  const isAdmin = computed(() => user.value?.role === 'admin')
 
   // Actions
-  const login = (userData: { email: string; name?: string; _id?: string }) => {
+  const login = (userData: { email: string; name?: string; _id?: string; role?: string }) => {
     user.value = userData
     isAuthenticated.value = true
     
@@ -48,7 +49,8 @@ export const useAuthStore = defineStore('auth', () => {
       login({
         email: userData.email,
         name: userData.name,
-        _id: userData._id
+        _id: userData._id,
+        role: userData.role
       })
       return { success: true, message: result.data.message || 'Login successful' }
     }
@@ -66,9 +68,10 @@ export const useAuthStore = defineStore('auth', () => {
       login({
         email: registeredUser.email,
         name: registeredUser.name,
-        _id: registeredUser._id
+        _id: registeredUser._id,
+        role: registeredUser.role
       })
-      return { success: true, message: result.data.message || 'Registration successful' }
+      return { success: true, message: result.data.message || 'Registration successful', errors: result.errors || [] }
     }
     
     return { success: false, message: result.message || 'Registration failed', errors: result.errors || [] }
@@ -89,6 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     isLoggedIn,
+    isAdmin,
     login,
     loginWithApi,
     registerWithApi,
