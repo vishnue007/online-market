@@ -118,7 +118,7 @@ import { ref } from 'vue'
 
 definePageMeta({
   middleware: 'admin',
-  layout: 'default'
+  layout: 'admin'
 })
 
 useHead({
@@ -177,5 +177,6 @@ const handleSubmit = async () => {
   }
 }
 </script>
+
 
 

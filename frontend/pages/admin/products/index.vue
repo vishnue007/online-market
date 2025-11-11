@@ -86,7 +86,7 @@ import { ref, onMounted } from 'vue'
 
 definePageMeta({
   middleware: 'admin',
-  layout: 'default'
+  layout: 'admin'
 })
 
 useHead({
@@ -133,5 +133,6 @@ onMounted(() => {
   loadProducts()
 })
 </script>
+
 
 
